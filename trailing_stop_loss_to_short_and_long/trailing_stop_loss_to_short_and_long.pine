@@ -1,0 +1,209 @@
+//@version=4
+//
+// ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒ 
+//  -----------------------------------------------------------------------------
+//  Copyright 2019 Mauricio Pimenta | exit490
+//  Trailing Stop Loss script may be freely distributed under the MIT license.
+//
+//  Permission is hereby granted, free of charge, 
+//  to any person obtaining a copy of this software and associated documentation files (the "Software"), 
+//  to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, 
+//  publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, 
+//  subject to the following conditions:
+//
+//  The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+//
+//  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, 
+//  EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
+//  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, 
+//  DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, 
+//  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+//
+//  -----------------------------------------------------------------------------
+//
+//  Authors:  @exit490
+//  Revision: v1.0.0
+//  Date:     03-Aug-2019
+//
+//  Description
+//  ===========
+//  This TradingView strategy it is designed to integrate with other strategies with indicators. 
+//  It performs a trailing stop loss from entry and exit conditions. 
+//  In this strategy you can add conditions for long and short positions.
+//  The strategy will ride up your stop loss when price moviment 1%.
+//  The strategy will close your operation when the market price crossed the stop loss.
+//  Also is possible to select the period that strategy will execute the backtest.
+//
+//  The strategy has the following parameters:
+//  Initial Stop Loss where can isert the value to first stop.
+//  Trade Type where can to select trade position.
+//  Backtest Period to select range.
+//  
+//  -----------------------------------------------------------------------------
+//  Disclaimer:
+//    1. I am not licensed financial advisors or broker dealers. I do not tell you 
+//       when or what to buy or sell. I developed this software which enables you 
+//       execute manual or automated trades multiple trades using TradingView. The 
+//       software allows you to set the criteria you want for entering and exiting 
+//       trades.
+//    2. Do not trade with money you cannot afford to lose.
+//    3. I do not guarantee consistent profits or that anyone can make money with no 
+//       effort. And I am not selling the holy grail.
+//    4. Every system can have winning and losing streaks.
+//    5. Money management plays a large role in the results of your trading. For 
+//       example: lot size, account size, broker leverage, and broker margin call 
+//       rules all have an effect on results. Also, your Take Profit and Stop Loss 
+//       settings for individual pair trades and for overall account equity have a 
+//       major impact on results. If you are new to trading and do not understand 
+//       these items, then I recommend you seek education materials to further your
+//       knowledge.
+//
+//    YOU NEED TO FIND AND USE THE TRADING SYSTEM THAT WORKS BEST FOR YOU AND YOUR 
+//    TRADING TOLERANCE.
+//
+//    I have provided nothing more than a tool with options for YOU to trade with 
+//    this program on TradingView.
+//    
+//    I accept suggestions to improve the script.
+//    If you encounter any problems I will be happy to share with me.
+//  -----------------------------------------------------------------------------
+//
+// ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒ //
+
+strategy("Trailing Stop Loss", overlay=true)
+
+// === ADD YOUR CONTIDIONAL HERE ====
+
+hasEntryLongConditional() => 1 == 1
+hasCloseLongConditional() => 1 != 1
+
+hasEntryShortConditional() => 1 == 1
+hasCloseShortConditional() => 1 != 1
+
+//
+// ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒ //
+
+// === BACKTEST RANGE ===
+
+FromMonth = input(defval = 1, title = "From Month", minval = 1)
+FromDay   = input(defval = 1, title = "From Day", minval = 1)
+FromYear  = input(defval = 2014, title = "From Year", minval = 2014)
+ToMonth   = input(defval = 31, title = "To Month", minval = 1)
+ToDay     = input(defval = 12, title = "To Day", minval = 1)
+ToYear    = input(defval = 9999, title = "To Year", minval = 2014)
+
+backTestPeriod() => (time > timestamp(FromYear, FromMonth, FromDay, 00, 00)) and (time < timestamp(ToYear, ToMonth, ToDay, 23, 59))
+
+//
+// ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒ //
+
+// === INPUT TO SELECT POSITION ===
+positionType = input(defval="LONG", title="Trade Type ", options=["LONG", "SHORT"])
+
+// === INPUT TO SELECT INITIAL STOP LOSS
+initialStopLossPercent = input(defval = 3.0, minval = 0.0)
+
+//
+// ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒ //
+
+// === GLOBAL VARIABLES AND FUNCTIONS TO STORE IMPORTANT CONDITIONALS
+stopLossPercent = positionType == "LONG" ? initialStopLossPercent * -1 : initialStopLossPercent
+
+var entryPrice = 0.0
+var updatedEntryPrice = 0.0
+var stopLossPrice = 0.0
+
+hasOpenTrade() => strategy.opentrades != 0
+notHasOpenTrade() => strategy.opentrades == 0
+
+strategyClose() =>
+    if positionType == "LONG"
+        strategy.close("LONG", when=true)
+    else 
+        strategy.close("SHORT", when=true)
+
+strategyOpen() =>
+    if positionType == "LONG"
+        strategy.entry("LONG", strategy.long, when=true)
+    else 
+        strategy.entry("SHORT", strategy.short, when=true)
+
+isLong() => positionType == "LONG" ? true : false
+isShort() => positionType == "SHORT" ? true : false
+
+//
+// ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒ //
+
+// === LOGIC TO TRAILING STOP IN LONG POSITION
+if (isLong() and backTestPeriod())
+
+    crossedStopLoss = close <= stopLossPrice
+    terminateOperation = hasOpenTrade() and (crossedStopLoss or hasCloseLongConditional())
+
+    if (terminateOperation)
+        entryPrice := 0.0
+        updatedEntryPrice := entryPrice
+        stopLossPrice := 0.0
+        strategyClose()
+    
+    startOperation = notHasOpenTrade() and hasEntryLongConditional()
+
+    if(startOperation)
+        entryPrice := close
+        updatedEntryPrice := entryPrice
+        stopLossPrice := entryPrice + (entryPrice * stopLossPercent) / 100
+        strategyOpen()
+        
+    strategyPercentege = (close - updatedEntryPrice) / updatedEntryPrice * 100.00
+    rideUpStopLoss = hasOpenTrade() and strategyPercentege > 1
+
+    if (isLong() and rideUpStopLoss)
+        stopLossPercent := stopLossPercent + strategyPercentege - 1.0
+        newStopLossPrice = updatedEntryPrice + (updatedEntryPrice * stopLossPercent) / 100  
+        stopLossPrice := max(stopLossPrice, newStopLossPrice)
+        updatedEntryPrice := stopLossPrice
+
+
+//
+// ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒ //
+
+// === LOGIC TO TRAILING STOP IN SHORT POSITION
+if (isShort() and backTestPeriod())
+
+    crossedStopLoss = close >= stopLossPrice
+    terminateOperation = hasOpenTrade() and (crossedStopLoss or hasCloseShortConditional())
+
+    if (terminateOperation)
+        entryPrice := 0.0
+        updatedEntryPrice := entryPrice
+        stopLossPrice := 0.0
+        strategyClose()
+    
+    startOperation = notHasOpenTrade() and hasEntryShortConditional()
+
+    if(startOperation)
+        entryPrice := close
+        updatedEntryPrice := entryPrice
+        stopLossPrice := entryPrice + (entryPrice * stopLossPercent) / 100
+        strategyOpen()
+        
+    strategyPercentege = (close - updatedEntryPrice) / updatedEntryPrice * 100.00
+    rideDownStopLoss = hasOpenTrade() and strategyPercentege < -1
+
+    if (rideDownStopLoss)
+        stopLossPercent := stopLossPercent + strategyPercentege + 1.0
+        newStopLossPrice = updatedEntryPrice + (updatedEntryPrice * stopLossPercent) / 100  
+        stopLossPrice := min(stopLossPrice, newStopLossPrice)
+        updatedEntryPrice := stopLossPrice
+    
+
+//
+// ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒ //
+
+// === DRAWING SHAPES 
+
+entryPricePlotConditinal = entryPrice == 0.0 ? na : entryPrice
+trailingStopLossPlotConditional = stopLossPrice == 0.0  ? na : stopLossPrice
+
+plotshape(entryPricePlotConditinal, title= "Entry Price", color=color.blue, style=shape.circle, location=location.absolute, size=size.tiny)
+plotshape(trailingStopLossPlotConditional, title= "Stop Loss", color=color.red, style=shape.circle, location=location.absolute, size=size.tiny)

@@ -1,0 +1,33 @@
+//@version=3
+// Copyright (c) 2019-present, Alex Orekhov (everget)
+// SuperTrend script may be freely distributed under the MIT license.
+study("SuperTrend", overlay=true)
+
+length = input(title="ATR Period", type=integer, defval=22)
+mult = input(title="ATR Multiplier", type=float, step=0.1, defval=3.0)
+
+atr = mult * atr(length)
+
+longStop = hl2 - atr
+longStopPrev = nz(longStop[1], longStop)
+longStop := close[1] > longStopPrev ? max(longStop, longStopPrev) : longStop
+
+shortStop = hl2 + atr
+shortStopPrev = nz(shortStop[1], shortStop)
+shortStop := close[1] < shortStopPrev ? min(shortStop, shortStopPrev) : shortStop
+
+dir = 1
+dir := nz(dir[1], dir)
+dir := dir == -1 and close > shortStopPrev ? 1 : dir == 1 and close < longStopPrev ? -1 : dir
+
+longColor = green
+shortColor = red
+
+plot(dir == 1 ? longStop : na, title="Long Stop", style=linebr, linewidth=2, color=longColor)
+plotshape(dir == 1 and dir[1] == -1 ? longStop : na, title="Long Stop Start", location=location.absolute, style=shape.circle, size=size.tiny, color=longColor, transp=0)
+
+plot(dir == 1 ? na : shortStop, title="Short Stop", style=linebr, linewidth=2, color=shortColor)
+plotshape(dir == -1 and dir[1] == 1 ? shortStop : na, title="Short Stop Start", location=location.absolute, style=shape.circle, size=size.tiny, color=shortColor, transp=0)
+
+changeCond = dir != dir[1]
+alertcondition(changeCond, title="Alert on SuperTrend Direction Change", message="SuperTrend has changed direction!")
