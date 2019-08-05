@@ -10,4 +10,4 @@ SuperTrend is a moving stop and reversal line based on the volatility (ATR).
 
 Copyright (c) 2019-present, Alex Orekhov (everget)
 
-SuperTrend script may be freely distributed under the terms of the [GPL-3.0 license](../LICENSE).
+SuperTrend script may be freely distributed under the terms of the [GPL-3.0 license](./LICENSE).
