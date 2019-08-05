@@ -91,7 +91,7 @@ backTestSectionFrom = input(title = "══════════════�
 
 FromMonth       = input(defval = 1, title = "Month", minval = 1)
 FromDay         = input(defval = 1, title = "Day", minval = 1)
-FromYear        = input(defval = 2014, title = "Year", minval = 2014)
+FromYear        = input(defval = 2019, title = "Year", minval = 2014)
 
 backTestSectionTo = input(title = "════════════════ TO ════════════════", defval = true, type = input.bool)
 ToMonth         = input(defval = 31, title = "Month", minval = 1)
@@ -110,13 +110,11 @@ positionType = input(defval="LONG", title="Position Type", options=["LONG", "SHO
 // === INPUT TO SELECT INITIAL STOP LOSS
 initialStopLossPercent = input(defval = 3.0, minval = 0.0, title="Initial Stop Loss")
 
-
 // === INPUT TO SELECT BARS BACK
 barsBack = input(title="ATR Period", defval=1)
 
 // === INPUT TO SELECT MULTPLIER FACTOR 
-
-multplierFactor = input(title="ATR multplierFactoriplier", step=0.1, defval=10.0)
+multplierFactor = input(title="ATR multplierFactoriplier", step=0.1, defval=3.0)
 
 //
 // ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒ //
