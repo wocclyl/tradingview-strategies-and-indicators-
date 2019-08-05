@@ -37,7 +37,7 @@
 //  INITIAL STOP LOSS - Where can isert the value to first stop.
 //  POSITION TYPE - Where can to select trade position.
 //  ATR PERIOD - To select number of bars back to execute calculation
-//  ATR multiplier - To add a multiplier factor on volatility
+//  ATR MULTIPLIER - To add a multiplier factor on volatility
 //  
 //  -----------------------------------------------------------------------------
 //  Disclaimer:
@@ -61,8 +61,7 @@
 //    YOU NEED TO FIND AND USE THE TRADING SYSTEM THAT WORKS BEST FOR YOU AND YOUR 
 //    TRADING TOLERANCE.
 //
-//    I have provided nothing more than a tool with options for YOU to trade with 
-//    this program on TradingView.
+//    I HAVE PROVIDED NOTHING MORE THAN A TOOL WITH OPTIONS FOR YOU TO TRADE WITH THIS PROGRAM ON TRADINGVIEW.
 //    
 //    I accept suggestions to improve the script.
 //    If you encounter any problems I will be happy to share with me.
