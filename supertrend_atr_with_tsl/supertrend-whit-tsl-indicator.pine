@@ -77,6 +77,9 @@ positionType = input(defval="LONG", title="Trade Type ", options=["LONG", "SHORT
 // === INPUT TO SELECT INITIAL STOP LOSS
 initialStopLossPercent = input(defval = 3.0, minval = 0.0)
 
+// == INPUT TO SELECT TRAILING STOP
+trailingPercent = input(defval = 1, minval = 0.0, title="Trailing Percent")
+
 // === INPUT TO SELECT BARS BACK
 barsBack = input(title="ATR Period", defval=1)
 
@@ -167,10 +170,10 @@ if (isLong())
         alertOpenPosition := true
         
     strategyPercentege = (close - updatedEntryPrice) / updatedEntryPrice * 100.00
-    rideUpStopLoss = hasOpenPosition and strategyPercentege > 1
+    rideUpStopLoss = hasOpenPosition and strategyPercentege > trailingPercent
 
     if (rideUpStopLoss)
-        stopLossPercent := stopLossPercent + strategyPercentege - 1.0
+        stopLossPercent := stopLossPercent + strategyPercentege
         newStopLossPrice = updatedEntryPrice + (updatedEntryPrice * stopLossPercent) / 100  
         stopLossPrice := max(stopLossPrice, newStopLossPrice)
         updatedEntryPrice := stopLossPrice
@@ -201,10 +204,10 @@ if (isShort())
         alertOpenPosition := true
         
     strategyPercentege = (close - updatedEntryPrice) / updatedEntryPrice * 100.00
-    rideDownStopLoss = hasOpenPosition and strategyPercentege < -1
+    rideDownStopLoss = hasOpenPosition and strategyPercentege < (trailingPercent * -1)
 
     if (rideDownStopLoss)
-        stopLossPercent := stopLossPercent + strategyPercentege + 1.0
+        stopLossPercent := stopLossPercent + strategyPercentege
         newStopLossPrice = updatedEntryPrice + (updatedEntryPrice * stopLossPercent) / 100  
         stopLossPrice := min(stopLossPrice, newStopLossPrice)
         updatedEntryPrice := stopLossPrice
