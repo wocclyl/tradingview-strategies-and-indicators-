@@ -234,8 +234,8 @@ trailingStopLossPlotConditional =  hasOpenPosition ? stopLossPrice : na
 
 plot(valueToPlot == 0.0 ? na : valueToPlot, title="LINE", linewidth=2, color=colorToPlot)
 
-plotshape(direction == 1 and direction[1] == -1 ? longStop : na, title="UPTREND", style=shape.labelup, location=location.absolute, size=size.normal, text="UPTREND", transp=0, textcolor = color.white, color=color.green, transp=0)
-plotshape(direction == -1 and direction[1] == 1 ? shortStop : na, title="DOWNTREND", style=shape.labeldown, location=location.absolute, size=size.normal, text="DOWNTREND", transp=0, textcolor = color.white, color=color.red, transp=0)
+//plotshape(direction == 1 and direction[1] == -1 ? longStop : na, title="UPTREND", style=shape.labelup, location=location.absolute, size=size.normal, text="UPTREND", transp=0, textcolor = color.white, color=color.green, transp=0)
+//plotshape(direction == -1 and direction[1] == 1 ? shortStop : na, title="DOWNTREND", style=shape.labeldown, location=location.absolute, size=size.normal, text="DOWNTREND", transp=0, textcolor = color.white, color=color.red, transp=0)
 
 profitLoss = (stopLossPrice[1] - entryPrice) / entryPrice * 100.00
 
