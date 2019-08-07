@@ -234,31 +234,42 @@ trailingStopLossPlotConditional =  hasOpenPosition ? stopLossPrice : na
 
 plot(valueToPlot == 0.0 ? na : valueToPlot, title="LINE", linewidth=2, color=colorToPlot)
 
-//plotshape(direction == 1 and direction[1] == -1 ? longStop : na, title="UPTREND", style=shape.labelup, location=location.absolute, size=size.normal, text="UPTREND", transp=0, textcolor = color.white, color=color.green, transp=0)
-//plotshape(direction == -1 and direction[1] == 1 ? shortStop : na, title="DOWNTREND", style=shape.labeldown, location=location.absolute, size=size.normal, text="DOWNTREND", transp=0, textcolor = color.white, color=color.red, transp=0)
+plotshape(direction == 1 and direction[1] == -1 ? longStop : na, title="UPTREND", style=shape.labelup, location=location.absolute, size=size.normal, text="UPTREND", transp=0, textcolor = color.white, color=color.green, transp=0)
+plotshape(direction == -1 and direction[1] == 1 ? shortStop : na, title="DOWNTREND", style=shape.labeldown, location=location.absolute, size=size.normal, text="DOWNTREND", transp=0, textcolor = color.white, color=color.red, transp=0)
 
-profitLoss = (stopLossPrice[1] - entryPrice) / entryPrice * 100.00
+tPercent = (stopLossPrice[1] - entryPrice) / entryPrice * 100.00
 
 ylocClosePosition = yloc.belowbar
 ylocOpenPosition = yloc.abovebar
+
 if isShort()
-    profitLoss := profitLoss * -1
+    tPercent := tPercent * -1
     ylocClosePosition := yloc.abovebar
     ylocOpenPosition := yloc.belowbar
 
 stopLossColor = color.red
 
-if profitLoss > 0
+if tPercent > 0
     stopLossColor := color.green
 
-stopLossPriceLabel :=  hasOpenPosition ? label.new(lapos_x_TP_SL, stopLossPrice[1], 'TRAILING STOP ' + tostring(profitLoss) + '%', color=stopLossColor, textcolor=color.white, style=label.style_labeldown, xloc=xloc.bar_time, size=size.small) : na
+stopLossPriceLabel :=  hasOpenPosition ? label.new(lapos_x_TP_SL, stopLossPrice[1], 'TRAILING STOP ' + tostring(tPercent) + '%', color=stopLossColor, textcolor=color.white, style=label.style_labeldown, xloc=xloc.bar_time, size=size.small) : na
 stopLossPriceLine := hasOpenPosition ? line.new(entryBarIndex[1], stopLossPrice[1], bar_index, stopLossPrice[1], extend=extend.right, color=stopLossColor) : na
 
 if (alertOpenPosition)
-    label.new(bar_index, close, 'OPEN POSITION', color=color.white, textcolor=color.white, style=label.style_flag, size=size.small, yloc=ylocOpenPosition)
+    alertText = 'OPEN POSITION\n' + tostring(close)
+    label.new(bar_index, close, alertText, color=color.white, textcolor=color.white, style=label.style_flag, size=size.small, yloc=ylocOpenPosition)
 
 if (alertClosePosition)
-    label.new(bar_index, close, 'CLOSE POSITION', color=color.white, textcolor=color.white, style=label.style_xcross, size=size.small, yloc=ylocClosePosition)
+    profitLoss = (close - entryPrice[1]) / entryPrice[1] * 100.00
+    crossColor = color.red
+    if (profitLoss > 0)
+        crossColor := color.green
+    
+    if (isShort())
+        profitLoss := profitLoss * -1
+    
+    alertText = 'CLOSE POSITION\n' + tostring(profitLoss) + '%'
+    label.new(bar_index, close, alertText, color=crossColor, textcolor=crossColor, style=label.style_xcross, size=size.small, yloc=ylocClosePosition)
 
 //
 // ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒ //
