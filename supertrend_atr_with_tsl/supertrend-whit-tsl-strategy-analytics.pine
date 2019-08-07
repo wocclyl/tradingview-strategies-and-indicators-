@@ -342,3 +342,9 @@ for i = 1 to 999
     if upTrendConditional
         closeInLastTrendReversal = close[i]
         break
+
+label infoLabel = na
+label.delete(infoLabel[1])
+lapos_x = timenow + round(change(time)*30)
+lapos_y = lowest(20)
+infoLabel := label.new(lapos_x, lapos_y, 'TESTE', color=color.green, textcolor=color.white, style=label.style_labeldown, yloc=yloc.price, xloc=xloc.bar_time)
