@@ -262,11 +262,12 @@ if (alertOpenPosition)
 if (alertClosePosition)
     profitLoss = (close - entryPrice[1]) / entryPrice[1] * 100.00
     crossColor = color.red
-    if (profitLoss > 0)
-        crossColor := color.green
     
     if (isShort())
         profitLoss := profitLoss * -1
+
+    if (profitLoss > 0)
+        crossColor := color.green
     
     alertText = 'CLOSE POSITION\n' + tostring(profitLoss) + '%'
     label.new(bar_index, close, alertText, color=crossColor, textcolor=crossColor, style=label.style_xcross, size=size.small, yloc=ylocClosePosition)
