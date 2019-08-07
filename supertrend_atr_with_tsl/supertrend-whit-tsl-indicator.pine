@@ -227,7 +227,7 @@ if (isShort())
 //
 // ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒ //
 
-// === DRAWING SHAPES 
+// === DRAWING SHAPES AND SHAPES
 
 entryPricePlotConditinal =  hasOpenPosition ? entryPrice : na
 trailingStopLossPlotConditional =  hasOpenPosition ? stopLossPrice : na
