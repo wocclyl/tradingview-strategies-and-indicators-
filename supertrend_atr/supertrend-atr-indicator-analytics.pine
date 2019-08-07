@@ -128,19 +128,22 @@ plotshape(direction == -1 and direction[1] == 1 ? shortStop : na, title="DOWNTRE
 
 // === ANALYTICS
 
-closeInLastTrendReversal = 0.0
+var closeInLastTrendReversal = 0.0
 majorPercentInTrend = 0.0
-majorCloseInTrend = 0.0
+var majorCloseInTrend = 0.0
 upTrendConditional = direction == 1 and direction[1] == -1
 downTrendConditional = direction == -1 and direction[1] == 1
 
 if downTrendConditional
-    for i = 1 to 999
-        majorCloseInTrend := max(close[i], close[i-1])
-
-        if upTrendConditional
-            closeInLastTrendReversal = close[i]
+    for i = 1 to 300
+        majorCloseInTrend := max(close[i], majorCloseInTrend)
+        if direction[i] == 1 and direction[i+1] == -1
+            closeInLastTrendReversal := close[i]
             break
-
     
-    label.new(bar_index, close, 'TESTE BOADO', color=color.white, textcolor=color.white, style=label.style_labeldown, size=size.small, yloc=yloc.abovebar)
+    infoText = 'DEBUG \n' + tostring(majorCloseInTrend) + '\n' + tostring(closeInLastTrendReversal)
+    label.new(bar_index, close, infoText, color=color.white, textcolor=color.black, style=label.style_labelup, size=size.small, yloc=yloc.belowbar)
+
+majorCloseInTrend = 0.0
+
+    // label.new(bar_index[i], close[i], tostring(close[i]), color=color.white, textcolor=color.black, style=label.style_labelup, size=size.small, yloc=yloc.belowbar)
