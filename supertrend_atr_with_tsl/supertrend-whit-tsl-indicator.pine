@@ -232,7 +232,6 @@ if (isShort())
 entryPricePlotConditinal =  hasOpenPosition ? entryPrice : na
 trailingStopLossPlotConditional =  hasOpenPosition ? stopLossPrice : na
 
-plotshape(entryPricePlotConditinal, title= "Entry Price", color=color.blue, style=shape.circle, location=location.absolute, size=size.tiny)
 plotshape(trailingStopLossPlotConditional, title= "Stop Loss", color=color.red, style=shape.circle, location=location.absolute, size=size.tiny)
 
 plot(valueToPlot == 0.0 ? na : valueToPlot, title="LINE", linewidth=2, color=colorToPlot)
@@ -250,9 +249,11 @@ stopLossColor = color.red
 if profitLoss > 0
     stopLossColor := color.green
 
-stopLossPriceLabel :=  label.new(lapos_x_TP_SL, stopLossPrice[1], 'STOPLOSS ' + tostring(profitLoss) + '%', color=stopLossColor, textcolor=color.white, style=label.style_labeldown, xloc=xloc.bar_time, size=size.small)
+stopLossPriceLabel :=  label.new(lapos_x_TP_SL, stopLossPrice[1], 'TRAILING STOP ' + tostring(profitLoss) + '%', color=stopLossColor, textcolor=color.white, style=label.style_labeldown, xloc=xloc.bar_time, size=size.small)
 stopLossPriceLine := line.new(entryBarIndex[1], stopLossPrice[1], bar_index, stopLossPrice[1], extend=extend.right, color=stopLossColor)
 
+if (alertOpenPosition)
+    label.new(bar_index, close, 'OPEN POSITION', color=color.white, textcolor=color.white, style=label.style_flag, size=size.small, yloc=yloc.abovebar)
 
 //
 // ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒ //
