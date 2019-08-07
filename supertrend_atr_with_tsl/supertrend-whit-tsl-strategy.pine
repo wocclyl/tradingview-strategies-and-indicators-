@@ -77,8 +77,8 @@ strategy(title = "SUPERTREND ATR WITH TRAILING STOP LOSS",
          calc_on_order_fills = true,
          calc_on_every_tick = true,
          backtest_fill_limits_assumption = 0,
-         default_qty_type = strategy.percent_of_equity,
-         default_qty_value = 100,
+         default_qty_type = strategy.cash,
+         default_qty_value = 1000,
          initial_capital = 1000,
          currency = currency.USD,
          linktoseries = true)
@@ -155,10 +155,10 @@ else
 //
 // === GLOBAL VARIABLES AND FUNCTIONS TO STORE IMPORTANT CONDITIONALS TO TRAILING STOP
 
-hasEntryLongConditional() => direction == 1
-hasCloseLongConditional() => direction == -1
+hasEntryLongConditional() => direction == 1 
+hasCloseLongConditional() => direction == -1 
 
-hasEntryShortConditional() => direction == -1
+hasEntryShortConditional() => direction == -1 
 hasCloseShortConditional() => direction == 1
 
 stopLossPercent = positionType == "LONG" ? initialStopLossPercent * -1 : initialStopLossPercent
