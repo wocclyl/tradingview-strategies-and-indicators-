@@ -70,48 +70,11 @@
 //
 // ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒ //
 
-strategy(title = "SUPERTREND ATR WITH TRAILING STOP LOSS",
-         shorttitle = "SUPERTREND ATR WITH TSL",
-         overlay = true,
-         precision = 8,
-         calc_on_order_fills = true,
-         calc_on_every_tick = true,
-         backtest_fill_limits_assumption = 0,
-         default_qty_type = strategy.cash,
-         default_qty_value = 1000,
-         initial_capital = 1000,
-         currency = currency.USD,
-         linktoseries = true)
-
-//
-// ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒ //
-
-// === BACKTEST RANGE ===
-backTestSectionFrom = input(title = "═══════════════ FROM ═══════════════", defval = true, type = input.bool)
-
-FromMonth       = input(defval = 1, title = "Month", minval = 1)
-FromDay         = input(defval = 1, title = "Day", minval = 1)
-FromYear        = input(defval = 2019, title = "Year", minval = 2014)
-
-backTestSectionTo = input(title = "════════════════ TO ════════════════", defval = true, type = input.bool)
-ToMonth         = input(defval = 31, title = "Month", minval = 1)
-ToDay           = input(defval = 12, title = "Day", minval = 1)
-ToYear          = input(defval = 9999, title = "Year", minval = 2014)
-
-backTestPeriod() => (time > timestamp(FromYear, FromMonth, FromDay, 00, 00)) and (time < timestamp(ToYear, ToMonth, ToDay, 23, 59))
-
-//
-// ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒ //
+study("SuperTrend ATR with Trailing Stop Loss", overlay=true, precision = 8)
 
 parameterSection = input(title = "═════════════ STRATEGY ═════════════", defval = true, type = input.bool)
 // === INPUT TO SELECT POSITION ===
 positionType = input(defval="LONG", title="Position Type", options=["LONG", "SHORT"])
-
-// === INPUT TO SELECT INITIAL STOP LOSS
-initialStopLossPercent = input(defval = 3.0, minval = 0.0, title="Initial Stop Loss")
-
-// == INPUT TO SELECT TRAILING STOP
-trailingPercent = input(defval = 1, minval = 0.0, title="Trailing Percent")
 
 // === INPUT TO SELECT BARS BACK
 barsBack = input(title="ATR Period", defval=1)
@@ -150,194 +113,28 @@ else
     valueToPlot := shortStop
     colorToPlot := color.red
 
-//
-// ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒ //
-//
-// === GLOBAL VARIABLES AND FUNCTIONS TO STORE IMPORTANT CONDITIONALS TO TRAILING STOP
-
-hasEntryLongConditional() => direction == 1 
-hasCloseLongConditional() => direction == -1 
-
-hasEntryShortConditional() => direction == -1 
-hasCloseShortConditional() => direction == 1
-
-stopLossPercent = positionType == "LONG" ? initialStopLossPercent * -1 : initialStopLossPercent
-
-var entryPrice = 0.0
-var updatedEntryPrice = 0.0
-var entryBarIndex = 0
-
-var stopLossPrice = 0.0
-
-var alertOpenPosition = false
-var alertClosePosition = false
-
-var label stopLossPriceLabel = na
-var line stopLossPriceLine = na
-
-label.delete(stopLossPriceLabel)
-line.delete(stopLossPriceLine)
-lapos_x_TP_SL = time + round(change(time)*15)
-
-hasOpenPosition = strategy.opentrades != 0
-notHasOpenPosition = strategy.opentrades == 0
-
-strategyClose() =>
-    if positionType == "LONG"
-        strategy.close("LONG", when=true)
-    else 
-        strategy.close("SHORT", when=true)
-
-strategyOpen() =>
-    if positionType == "LONG"
-        strategy.entry("LONG", strategy.long, when=true)
-    else 
-        strategy.entry("SHORT", strategy.short, when=true)
-
 isLong() => positionType == "LONG" ? true : false
 isShort() => positionType == "SHORT" ? true : false
-
-
-//
-// ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒ //
-//
-// === LOGIC TO TRAILING STOP IN LONG POSITION
-if (isLong() and backTestPeriod())
-
-    crossedStopLoss = close <= stopLossPrice
-    terminateOperation = hasOpenPosition and (crossedStopLoss or hasCloseLongConditional())
-
-    if (terminateOperation)
-        entryPrice := 0.0
-        updatedEntryPrice := entryPrice
-        stopLossPrice := 0.0
-        strategyClose()
-        alertClosePosition := true
-    
-    startOperation = notHasOpenPosition and hasEntryLongConditional()
-
-    if(startOperation)
-        entryPrice := close
-        updatedEntryPrice := entryPrice
-        stopLossPrice := entryPrice + (entryPrice * stopLossPercent) / 100
-        strategyOpen()
-        alertOpenPosition := true
-        entryBarIndex := bar_index
-        
-    strategyPercentege = (close - updatedEntryPrice) / updatedEntryPrice * 100.00
-    rideUpStopLoss = hasOpenPosition and strategyPercentege > trailingPercent
-
-    if (rideUpStopLoss)
-        stopLossPercent := stopLossPercent + strategyPercentege
-        newStopLossPrice = updatedEntryPrice + (updatedEntryPrice * stopLossPercent) / 100  
-        stopLossPrice := max(stopLossPrice, newStopLossPrice)
-        updatedEntryPrice := stopLossPrice
-
-//
-// ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒ //
-//
-// === LOGIC TO TRAILING STOP IN SHORT POSITION
-if (isShort() and backTestPeriod())
-
-    crossedStopLoss = close >= stopLossPrice
-    terminateOperation = hasOpenPosition and (crossedStopLoss or hasCloseShortConditional())
-
-    if (terminateOperation)
-        entryPrice := 0.0
-        updatedEntryPrice := entryPrice
-        stopLossPrice := 0.0
-        strategyClose()
-        alertClosePosition := true
-    
-    startOperation = notHasOpenPosition and hasEntryShortConditional()
-
-    if(startOperation)
-        entryPrice := close
-        updatedEntryPrice := entryPrice
-        stopLossPrice := entryPrice + (entryPrice * stopLossPercent) / 100
-        strategyOpen()
-        alertOpenPosition := true
-        entryBarIndex := bar_index
-        
-    strategyPercentege = (close - updatedEntryPrice) / updatedEntryPrice * 100.00
-    rideDownStopLoss = hasOpenPosition and strategyPercentege < (trailingPercent * -1)
-
-    if (rideDownStopLoss)
-        stopLossPercent := stopLossPercent + strategyPercentege
-        newStopLossPrice = updatedEntryPrice + (updatedEntryPrice * stopLossPercent) / 100  
-        stopLossPrice := min(stopLossPrice, newStopLossPrice)
-        updatedEntryPrice := stopLossPrice
-
 
 //
 // ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒ //
 
 // === DRAWING SHAPES AND SHAPES
 
-entryPricePlotConditinal =  hasOpenPosition ? entryPrice : na
-trailingStopLossPlotConditional =  hasOpenPosition ? stopLossPrice : na
-
 plot(valueToPlot == 0.0 ? na : valueToPlot, title="LINE", linewidth=2, color=colorToPlot)
 
 plotshape(direction == 1 and direction[1] == -1 ? longStop : na, title="UPTREND", style=shape.labelup, location=location.absolute, size=size.normal, text="UPTREND", transp=0, textcolor = color.white, color=color.green, transp=0)
 plotshape(direction == -1 and direction[1] == 1 ? shortStop : na, title="DOWNTREND", style=shape.labeldown, location=location.absolute, size=size.normal, text="DOWNTREND", transp=0, textcolor = color.white, color=color.red, transp=0)
 
-tPercent = (stopLossPrice[1] - entryPrice) / entryPrice * 100.00
-
-ylocClosePosition = yloc.belowbar
-ylocOpenPosition = yloc.abovebar
-
-if isShort()
-    tPercent := tPercent * -1
-    ylocClosePosition := yloc.abovebar
-    ylocOpenPosition := yloc.belowbar
-
-stopLossColor = color.red
-
-if tPercent > 0
-    stopLossColor := color.green
-
-stopLossPriceLabel :=  hasOpenPosition ? label.new(lapos_x_TP_SL, stopLossPrice[1], 'TRAILING STOP ' + tostring(tPercent) + '%', color=stopLossColor, textcolor=color.white, style=label.style_labeldown, xloc=xloc.bar_time, size=size.small) : na
-stopLossPriceLine := hasOpenPosition ? line.new(entryBarIndex[1], stopLossPrice[1], bar_index, stopLossPrice[1], extend=extend.right, color=stopLossColor) : na
-
-if (alertOpenPosition)
-    alertText = 'OPEN POSITION\n' + tostring(close)
-    label.new(bar_index, close, alertText, color=color.white, textcolor=color.white, style=label.style_flag, size=size.small, yloc=ylocOpenPosition)
-
-if (alertClosePosition)
-    profitLoss = (close - entryPrice[1]) / entryPrice[1] * 100.00
-    crossColor = color.red
-    
-    if (isShort())
-        profitLoss := profitLoss * -1
-
-    if (profitLoss > 0)
-        crossColor := color.green
-    
-    alertText = 'CLOSE POSITION\n' + tostring(profitLoss) + '%'
-    label.new(bar_index, close, alertText, color=crossColor, textcolor=crossColor, style=label.style_xcross, size=size.small, yloc=ylocClosePosition)
-
-//
-// ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒ //
-
-// === ALERT CONDITION AND RESET VARIABLES 
-
-alertcondition(alertOpenPosition, title="Open Position", message="Entry Position!")
-alertcondition(alertClosePosition, title="Close Position", message="Close Position!")
-
-alertOpenPosition := false
-alertClosePosition := false
-
-//
-// ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒ //
-
 // === ANALYTICS
 
-closeInLastTrendReversal = na
-majorPercentInTrend = na
+closeInLastTrendReversal = 0.0
+majorPercentInTrend = 0.0
+majorCloseInTrend = 0.0
 upTrendConditional = direction == 1 and direction[1] == -1
 
 for i = 1 to 999
+    majorCloseInTrend := max(close[i], close[i-1])
 
     if upTrendConditional
         closeInLastTrendReversal = close[i]
