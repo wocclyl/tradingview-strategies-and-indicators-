@@ -132,16 +132,15 @@ closeInLastTrendReversal = 0.0
 majorPercentInTrend = 0.0
 majorCloseInTrend = 0.0
 upTrendConditional = direction == 1 and direction[1] == -1
+downTrendConditional = direction == -1 and direction[1] == 1
 
-for i = 1 to 999
-    majorCloseInTrend := max(close[i], close[i-1])
+if downTrendConditional
+    for i = 1 to 999
+        majorCloseInTrend := max(close[i], close[i-1])
 
-    if upTrendConditional
-        closeInLastTrendReversal = close[i]
-        break
+        if upTrendConditional
+            closeInLastTrendReversal = close[i]
+            break
 
-label infoLabel = na
-label.delete(infoLabel[1])
-lapos_x = timenow + round(change(time)*30)
-lapos_y = lowest(20)
-infoLabel := label.new(lapos_x, lapos_y, 'TESTE', color=color.green, textcolor=color.white, style=label.style_labeldown, yloc=yloc.price, xloc=xloc.bar_time)
+    
+    label.new(bar_index, close, 'TESTE BOADO', color=color.white, textcolor=color.white, style=label.style_labeldown, size=size.small, yloc=yloc.abovebar)
