@@ -170,7 +170,7 @@ if isLong() and downTrendConditional
     targetHitPercentText = '\nHIT_%: ' + tostring((targetHit/upTrendOccurrences) * 100) 
 
     infoText = 'ANALYTICS\n'  + majorCloseInTrendText + minorCloseInTrendText + avgMajorPercentInTrendText + avgMinorPercentInTrendText + upTrendOccurrencesText + targetHitText + targetHitPercentText
-    label.new(bar_index, close + close*-0.01 , infoText, color=color.blue, textcolor=color.white, style=label.style_labelup, size=size.normal, yloc=yloc.price)
+    label.new(bar_index, high + high*-0.015 , infoText, color=color.blue, textcolor=color.white, style=label.style_labelup, size=size.normal, yloc=yloc.price)
 
 if isShort() and upTrendConditional
     for i = 1 to 300
