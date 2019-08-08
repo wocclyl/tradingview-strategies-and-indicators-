@@ -135,6 +135,8 @@ var upTrendOccurrences = 0
 upTrendConditional = direction == 1 and direction[1] == -1
 downTrendConditional = direction == -1 and direction[1] == 1
 
+var label avgLabel = na
+label.delete(avgLabel)
 if downTrendConditional
     for i = 1 to 300
         majorCloseInTrend := max(close[i], majorCloseInTrend)
@@ -149,7 +151,12 @@ if downTrendConditional
 
 majorCloseInTrend := 0.0
 
+var totalPercent = 0.0
+for i = 0 to upTrendOccurrences
+    totalPercent := totalPercent + majorPercentInTrend[i]
 
+lapos_x = timenow + round(change(time)*15)
+lapos_y = highest(20)
+avgText = tostring(totalPercent)
+avgLabel :=  label.new(lapos_x, lapos_y, avgText, color=color.blue, textcolor=color.white, style=label.style_labeldown, xloc=xloc.bar_time, size=size.small)
 
-
-// label.new(bar_index[i], close[i], tostring(close[i]), color=color.white, textcolor=color.black, style=label.style_labelup, size=size.small, yloc=yloc.belowbar)
