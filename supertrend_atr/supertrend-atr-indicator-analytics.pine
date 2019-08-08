@@ -138,6 +138,7 @@ var upTrendOccurrences = 0
 var totalMajorPercent = 0.0
 var totalMinorPercent = 0.0
 var targetHit = 0
+var
 
 upTrendConditional = direction == 1 and direction[1] == -1
 downTrendConditional = direction == -1 and direction[1] == 1
@@ -166,12 +167,12 @@ if downTrendConditional
     majorCloseInTrendText = '\nMAJOR_%: ' + tostring(majorPercentInTrend)
     minorCloseInTrendText =  '\nMINOR_%: ' + tostring(minorPercentInTrend)
     avgMajorPercentInTrendText = '\n\nAVG MAJOR_%: ' + tostring(totalMajorPercent/upTrendOccurrences)
-    avgMinorPercentInTrendText = '\nAVG MINOR%: ' + tostring(totalMinorPercent/upTrendOccurrences)
+    avgMinorPercentInTrendText = '\nAVG MINOR_%: ' + tostring(totalMinorPercent/upTrendOccurrences)
     upTrendOccurrencesText = '\n\nUPTRENDS: ' + tostring(upTrendOccurrences)
     targetHitText = '\nHIT ' + tostring(takeProfit) + '%: ' + tostring(targetHit)
 
     infoText = 'ANALYTICS\n'  + majorCloseInTrendText + minorCloseInTrendText + avgMajorPercentInTrendText + avgMinorPercentInTrendText + upTrendOccurrencesText + targetHitText 
-    label.new(bar_index, close*2, infoText, color=color.white, textcolor=color.black, style=label.style_labelup, size=size.normal, yloc=yloc.belowbar)
+    label.new(bar_index, close + close*-0.01 , infoText, color=color.blue, textcolor=color.white, style=label.style_labelup, size=size.normal, yloc=yloc.price)
 
 majorCloseInTrend := 0.0
 minorCloseInTrend := 30000.0
