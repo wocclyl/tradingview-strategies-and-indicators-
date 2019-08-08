@@ -142,8 +142,6 @@ var targetHit = 0
 upTrendConditional = direction == 1 and direction[1] == -1
 downTrendConditional = direction == -1 and direction[1] == 1
 
-var label avgLabel = na
-label.delete(avgLabel)
 if isLong() and downTrendConditional
     for i = 1 to 300
         majorCloseInTrend := max(high[i], majorCloseInTrend)
@@ -173,6 +171,37 @@ if isLong() and downTrendConditional
 
     infoText = 'ANALYTICS\n'  + majorCloseInTrendText + minorCloseInTrendText + avgMajorPercentInTrendText + avgMinorPercentInTrendText + upTrendOccurrencesText + targetHitText + targetHitPercentText
     label.new(bar_index, close + close*-0.01 , infoText, color=color.blue, textcolor=color.white, style=label.style_labelup, size=size.normal, yloc=yloc.price)
+
+if isShort() and upTrendConditional
+    for i = 1 to 300
+        majorCloseInTrend := max(high[i], majorCloseInTrend)
+        minorCloseInTrend := min(minorCloseInTrend, low[i])
+        if direction[i] == 1 and direction[i+1] == -1
+            closeInLastTrendReversal := close[i]
+            break
+    
+    majorPercentInTrend := (majorCloseInTrend - closeInLastTrendReversal) / closeInLastTrendReversal * 100.00
+    minorPercentInTrend := (minorCloseInTrend - closeInLastTrendReversal) / closeInLastTrendReversal * 100.00
+
+    if(majorPercentInTrend > takeProfit)
+        targetHit := targetHit + 1
+
+    upTrendOccurrences := upTrendOccurrences + 1
+
+    totalMajorPercent := nz(totalMajorPercent + majorPercentInTrend)
+    totalMinorPercent := nz(totalMinorPercent + minorPercentInTrend)
+
+    majorCloseInTrendText = '\nMAJOR_%: ' + tostring(majorPercentInTrend)
+    minorCloseInTrendText =  '\nMINOR_%: ' + tostring(minorPercentInTrend)
+    avgMajorPercentInTrendText = '\n\nAVG MAJOR_%: ' + tostring(totalMajorPercent/upTrendOccurrences)
+    avgMinorPercentInTrendText = '\nAVG MINOR_%: ' + tostring(totalMinorPercent/upTrendOccurrences)
+    upTrendOccurrencesText = '\n\nUPTRENDS: ' + tostring(upTrendOccurrences)
+    targetHitText = '\nHIT ' + tostring(takeProfit) + '%: ' + tostring(targetHit)
+    targetHitPercentText = '\nHIT_%: ' + tostring((targetHit/upTrendOccurrences) * 100) 
+
+    infoText = 'ANALYTICS\n'  + majorCloseInTrendText + minorCloseInTrendText + avgMajorPercentInTrendText + avgMinorPercentInTrendText + upTrendOccurrencesText + targetHitText + targetHitPercentText
+    label.new(bar_index, close + close*-0.01 , infoText, color=color.blue, textcolor=color.white, style=label.style_labelup, size=size.normal, yloc=yloc.price)
+
 
 majorCloseInTrend := 0.0
 minorCloseInTrend := 30000.0
