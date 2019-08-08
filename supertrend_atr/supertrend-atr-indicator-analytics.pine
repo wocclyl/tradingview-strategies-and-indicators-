@@ -70,7 +70,7 @@
 //
 // ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒ //
 
-study("SuperTrend ATR with Trailing Stop Loss", overlay=true, precision = 8)
+study("SUPERTREND ATR WITH ANALYTICS", overlay=true, precision = 8)
 
 parameterSection = input(title = "═════════════ STRATEGY ═════════════", defval = true, type = input.bool)
 // === INPUT TO SELECT POSITION ===
