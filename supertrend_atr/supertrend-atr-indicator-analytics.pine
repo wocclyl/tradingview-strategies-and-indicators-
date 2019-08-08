@@ -144,7 +144,7 @@ downTrendConditional = direction == -1 and direction[1] == 1
 
 var label avgLabel = na
 label.delete(avgLabel)
-if downTrendConditional
+if isLong() and downTrendConditional
     for i = 1 to 300
         majorCloseInTrend := max(high[i], majorCloseInTrend)
         minorCloseInTrend := min(minorCloseInTrend, low[i])
