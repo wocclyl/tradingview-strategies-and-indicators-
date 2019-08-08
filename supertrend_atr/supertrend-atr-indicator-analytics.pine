@@ -74,7 +74,7 @@ study("SUPERTREND ATR WITH ANALYTICS", overlay=true, precision = 8)
 
 parameterSection = input(title = "═════════════ STRATEGY ═════════════", defval = true, type = input.bool)
 // === INPUT TO SELECT POSITION ===
-positionType = input(defval="LONG", title="Position Type", options=["LONG", "SHORT"])
+positionType = input(defval="SHORT", title="Position Type", options=["LONG", "SHORT"])
 takeProfit = input(defval = 3.0, minval = 0.0, title="Take Profit")
 
 // === INPUT TO SELECT BARS BACK
@@ -116,7 +116,7 @@ else
 
 isLong() => positionType == "LONG" ? true : false
 isShort() => positionType == "SHORT" ? true : false
-
+takeProfit := isShort() ? takeProfit * -1 : takeProfit
 //
 // ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒ //
 
@@ -176,14 +176,14 @@ if isShort() and upTrendConditional
     for i = 1 to 300
         majorCloseInTrend := max(high[i], majorCloseInTrend)
         minorCloseInTrend := min(minorCloseInTrend, low[i])
-        if direction[i] == 1 and direction[i+1] == -1
+        if direction[i] == -1 and direction[i+1] == 1
             closeInLastTrendReversal := close[i]
             break
     
     majorPercentInTrend := (majorCloseInTrend - closeInLastTrendReversal) / closeInLastTrendReversal * 100.00
     minorPercentInTrend := (minorCloseInTrend - closeInLastTrendReversal) / closeInLastTrendReversal * 100.00
 
-    if(majorPercentInTrend > takeProfit)
+    if(minorPercentInTrend < takeProfit)
         targetHit := targetHit + 1
 
     upTrendOccurrences := upTrendOccurrences + 1
@@ -200,7 +200,7 @@ if isShort() and upTrendConditional
     targetHitPercentText = '\nHIT_%: ' + tostring((targetHit/upTrendOccurrences) * 100) 
 
     infoText = 'ANALYTICS\n'  + majorCloseInTrendText + minorCloseInTrendText + avgMajorPercentInTrendText + avgMinorPercentInTrendText + upTrendOccurrencesText + targetHitText + targetHitPercentText
-    label.new(bar_index, close + close*-0.01 , infoText, color=color.blue, textcolor=color.white, style=label.style_labelup, size=size.normal, yloc=yloc.price)
+    label.new(bar_index, high + high*0.015 , infoText, color=color.blue, textcolor=color.white, style=label.style_labeldown, size=size.normal, yloc=yloc.price)
 
 
 majorCloseInTrend := 0.0
