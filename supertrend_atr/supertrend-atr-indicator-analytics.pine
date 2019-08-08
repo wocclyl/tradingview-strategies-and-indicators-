@@ -133,7 +133,7 @@ var closeInLastTrendReversal = 0.0
 var majorPercentInTrend = 0.0
 var minorPercentInTrend = 0.0
 var majorCloseInTrend = 0.0
-var minorCloseInTrend = 30000.00
+var minorCloseInTrend = 30000.0
 var upTrendOccurrences = 0
 var totalMajorPercent = 0.0
 var totalMinorPercent = 0.0
@@ -147,7 +147,7 @@ label.delete(avgLabel)
 if downTrendConditional
     for i = 1 to 300
         majorCloseInTrend := max(high[i], majorCloseInTrend)
-        minorCloseInTrend := min(low[i], minorCloseInTrend)
+        minorCloseInTrend := min(minorCloseInTrend, low[i])
         if direction[i] == 1 and direction[i+1] == -1
             closeInLastTrendReversal := close[i]
             break
@@ -163,10 +163,18 @@ if downTrendConditional
     totalMajorPercent := nz(totalMajorPercent + majorPercentInTrend)
     totalMinorPercent := nz(totalMinorPercent + minorPercentInTrend)
 
-    infoText = 'DEBUG \n' + tostring(majorCloseInTrend) + '\n' + tostring(minorCloseInTrend) + '\n' + tostring(closeInLastTrendReversal) + '\n' + tostring(majorPercentInTrend) + '\n' + tostring(upTrendOccurrences) + '\n' + tostring(targetHit) + '\n' + tostring(totalMajorPercent/upTrendOccurrences) 
-    label.new(bar_index, close*2, infoText, color=color.white, textcolor=color.black, style=label.style_labelup, size=size.small, yloc=yloc.belowbar)
+    majorCloseInTrendText = '\nMAJOR_%: ' + tostring(majorPercentInTrend)
+    minorCloseInTrendText =  '\nMINOR_%: ' + tostring(minorPercentInTrend)
+    avgMajorPercentInTrendText = '\n\nAVG MAJOR_%: ' + tostring(totalMajorPercent/upTrendOccurrences)
+    avgMinorPercentInTrendText = '\nAVG MINOR%: ' + tostring(totalMinorPercent/upTrendOccurrences)
+    upTrendOccurrencesText = '\n\nUPTRENDS: ' + tostring(upTrendOccurrences)
+    targetHitText = '\nHIT ' + tostring(takeProfit) + '%: ' + tostring(targetHit)
+
+    infoText = 'ANALYTICS\n'  + majorCloseInTrendText + minorCloseInTrendText + avgMajorPercentInTrendText + avgMinorPercentInTrendText + upTrendOccurrencesText + targetHitText 
+    label.new(bar_index, close*2, infoText, color=color.white, textcolor=color.black, style=label.style_labelup, size=size.normal, yloc=yloc.belowbar)
 
 majorCloseInTrend := 0.0
+minorCloseInTrend := 30000.0
 
 alertcondition(upTrendConditional, title="Open Position", message="Open Position")
 alertcondition(downTrendConditional, title="Close Position", message="Close Position")
