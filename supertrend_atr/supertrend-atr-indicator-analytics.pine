@@ -129,8 +129,9 @@ plotshape(direction == -1 and direction[1] == 1 ? shortStop : na, title="DOWNTRE
 // === ANALYTICS
 
 var closeInLastTrendReversal = 0.0
-majorPercentInTrend = 0.0
+var majorPercentInTrend = 0.0
 var majorCloseInTrend = 0.0
+var upTrendOccurrences = 0
 upTrendConditional = direction == 1 and direction[1] == -1
 downTrendConditional = direction == -1 and direction[1] == 1
 
@@ -141,9 +142,14 @@ if downTrendConditional
             closeInLastTrendReversal := close[i]
             break
     
-    infoText = 'DEBUG \n' + tostring(majorCloseInTrend) + '\n' + tostring(closeInLastTrendReversal)
+    majorPercentInTrend := (majorCloseInTrend - closeInLastTrendReversal) / closeInLastTrendReversal * 100.00
+    upTrendOccurrences := upTrendOccurrences + 1
+    infoText = 'DEBUG \n' + tostring(majorCloseInTrend) + '\n' + tostring(closeInLastTrendReversal) + '\n' + tostring(majorPercentInTrend) + '\n' + tostring(upTrendOccurrences)
     label.new(bar_index, close, infoText, color=color.white, textcolor=color.black, style=label.style_labelup, size=size.small, yloc=yloc.belowbar)
 
-majorCloseInTrend = 0.0
+majorCloseInTrend := 0.0
 
-    // label.new(bar_index[i], close[i], tostring(close[i]), color=color.white, textcolor=color.black, style=label.style_labelup, size=size.small, yloc=yloc.belowbar)
+
+
+
+// label.new(bar_index[i], close[i], tostring(close[i]), color=color.white, textcolor=color.black, style=label.style_labelup, size=size.small, yloc=yloc.belowbar)
