@@ -74,7 +74,7 @@ study("SUPERTREND ATR WITH ANALYTICS", overlay=true, precision = 8)
 
 parameterSection = input(title = "═════════════ STRATEGY ═════════════", defval = true, type = input.bool)
 // === INPUT TO SELECT POSITION ===
-positionType = input(defval="SHORT", title="Position Type", options=["LONG", "SHORT"])
+positionType = input(defval="LONG", title="Position Type", options=["LONG", "SHORT"])
 takeProfit = input(defval = 3.0, minval = 0.0, title="Take Profit")
 
 // === INPUT TO SELECT BARS BACK
@@ -134,8 +134,10 @@ var upTrendOccurrences = 0
 var downTrendOcurrences = 0
 var totalMajorPercent = 0.0
 var totalMinorPercent = 0.0
-var totalBar = 0.0
+
 var targetHit = 0
+var majorTotalBars = 0.0
+var totalBar = 0.0
 
 upTrendConditional = direction == 1 and direction[1] == -1
 downTrendConditional = direction == -1 and direction[1] == 1
@@ -147,10 +149,11 @@ if isLong() and downTrendConditional
     minorPercentInTrend = 0.0
     majorCloseInTrend = high
     minorCloseInTrend = low
-    
+    localTotalBars = 0.0
     for i = 0 to 300
-        totalBar := totalBar + 1.0
+        
         if direction[i] == 1 and direction[i+1] == 1
+            localTotalBars := localTotalBars + 1.0
             majorCloseInTrend := max(high[i], majorCloseInTrend)
             minorCloseInTrend := min(low[i], minorCloseInTrend)
             
@@ -167,6 +170,9 @@ if isLong() and downTrendConditional
 
     totalMajorPercent := nz(totalMajorPercent + majorPercentInTrend)
     totalMinorPercent := nz(totalMinorPercent + minorPercentInTrend)
+    
+    totalBar := localTotalBars + totalBar
+    majorTotalBars := max(majorTotalBars, localTotalBars)
 
     upTrendOccurrencesText =     '\nUPTRENDS: ' + tostring(upTrendOccurrences)
 
@@ -175,12 +181,14 @@ if isLong() and downTrendConditional
     
     avgMajorPercentInTrendText = '\n\nAVG MAJOR_%: ' + tostring(totalMajorPercent/upTrendOccurrences)
     avgMinorPercentInTrendText = '\nAVG MINOR_%: ' + tostring(totalMinorPercent/upTrendOccurrences)
+
+    majorTotalbarsText =         '\n\nMAJOR T_BARS: ' + tostring(majorTotalBars)
     avgBars =                    '\nAVG BARS: ' + tostring(totalBar/upTrendOccurrences)
     
     targetHitText =              '\n\nHIT ' + tostring(takeProfit) + '%: ' + tostring(targetHit)
     targetHitPercentText =       '\nHIT_%: ' + tostring((targetHit/upTrendOccurrences) * 100) 
 
-    infoText = 'ANALYTICS'  + upTrendOccurrencesText + majorCloseInTrendText + minorCloseInTrendText + avgMajorPercentInTrendText + avgMinorPercentInTrendText + avgBars + targetHitText + targetHitPercentText
+    infoText = 'ANALYTICS'  + upTrendOccurrencesText + majorCloseInTrendText + minorCloseInTrendText + avgMajorPercentInTrendText + avgMinorPercentInTrendText + majorTotalbarsText + avgBars + targetHitText + targetHitPercentText
     label.new(bar_index, high + high*-0.015 , infoText, color=color.blue, textcolor=color.white, style=label.style_labelup, size=size.normal, yloc=yloc.price)
 
 if isShort() and upTrendConditional
@@ -190,6 +198,7 @@ if isShort() and upTrendConditional
     minorPercentInTrend = 0.0
     majorCloseInTrend = high
     minorCloseInTrend = low
+    totalBar = 0.0
 
     for i = 1 to 300
         totalBar := totalBar + 1.0
@@ -228,8 +237,4 @@ if isShort() and upTrendConditional
 
 alertcondition(upTrendConditional, title="UPTREND", message="Buy")
 alertcondition(downTrendConditional, title="DOWNTREND", message="Sell")
-//lapos_x = timenow + round(change(time)*30)
-//lapos_y = highest(20)
-//avgText = tostring(totalMajorPercent/upTrendOccurrences)  + '\n' + tostring(totalMinorPercent/upTrendOccurrences) + '\n' + tostring(targetHit) +'\n' + tostring(upTrendOccurrences)
-//avgLabel :=  label.new(lapos_x, lapos_y, avgText, color=color.blue, textcolor=color.white, style=label.style_labeldown, xloc=xloc.bar_time, size=size.large)
 
