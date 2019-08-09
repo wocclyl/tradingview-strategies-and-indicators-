@@ -193,8 +193,9 @@ if isLong() and downTrendConditional
     infoText := appendText(infoText, '\nTREND MINOR_%: ' + tostring(minorPercentInTrend))
     infoText := appendText(infoText, '\nTREND % CLOSE: ' + tostring(trendPercentClose))
     infoText := appendText(infoText, '\nTREND SUCCESS: ' + tostring(trendPercentCloseSuccess))
- 
-    infoText := appendText(infoText, '\n\nAVG MAJOR_%: ' + tostring(totalMajorPercent/upTrendOccurrences))
+    
+    infoText := appendText(infoText, '\n\nPERCENT TREND SUCCESS: ' + tostring((trendPercentCloseSuccess/upTrendOccurrences) * 100) )
+    infoText := appendText(infoText, '\nAVG MAJOR_%: ' + tostring(totalMajorPercent/upTrendOccurrences))
     infoText := appendText(infoText, '\nAVG MINOR_%: ' + tostring(totalMinorPercent/upTrendOccurrences))
 
     infoText := appendText(infoText, '\n\nMAJOR T_BARS: ' + tostring(majorTotalBars))
