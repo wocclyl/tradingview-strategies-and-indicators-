@@ -129,12 +129,9 @@ plotshape(direction == -1 and direction[1] == 1 ? shortStop : na, title="DOWNTRE
 
 // === ANALYTICS
 
-var closeInLastTrendReversal = 0.0
-var majorPercentInTrend = 0.0
-var minorPercentInTrend = 0.0
-var majorCloseInTrend = 0.0
-var minorCloseInTrend = 30000.0
+
 var upTrendOccurrences = 0
+var downTrendOcurrences = 0
 var totalMajorPercent = 0.0
 var totalMinorPercent = 0.0
 var targetHit = 0
@@ -143,6 +140,13 @@ upTrendConditional = direction == 1 and direction[1] == -1
 downTrendConditional = direction == -1 and direction[1] == 1
 
 if isLong() and downTrendConditional
+
+    closeInLastTrendReversal = 0.0
+    majorPercentInTrend = 0.0
+    minorPercentInTrend = 0.0
+    majorCloseInTrend = high
+    minorCloseInTrend = low
+    
     for i = 0 to 300
         
         if direction[i] == 1 and direction[i+1] == 1
@@ -178,38 +182,43 @@ if isLong() and downTrendConditional
     label.new(bar_index, high + high*-0.015 , infoText, color=color.blue, textcolor=color.white, style=label.style_labelup, size=size.normal, yloc=yloc.price)
 
 if isShort() and upTrendConditional
+
+    closeInLastTrendReversal = 0.0
+    majorPercentInTrend = 0.0
+    minorPercentInTrend = 0.0
+    majorCloseInTrend = high
+    minorCloseInTrend = low
+
     for i = 1 to 300
-        majorCloseInTrend := max(high[i], majorCloseInTrend)
-        minorCloseInTrend := min(minorCloseInTrend, low[i])
+
+        if direction[i] == -1 and direction[i+1] == -1
+            majorCloseInTrend := max(high[i], majorCloseInTrend)
+            minorCloseInTrend := min(low[i], minorCloseInTrend)
+            
         if direction[i] == -1 and direction[i+1] == 1
             closeInLastTrendReversal := close[i]
-            break
-    
-    majorPercentInTrend := (majorCloseInTrend - closeInLastTrendReversal) / closeInLastTrendReversal * 100.00
-    minorPercentInTrend := (minorCloseInTrend - closeInLastTrendReversal) / closeInLastTrendReversal * 100.00
+            majorPercentInTrend := (majorCloseInTrend - closeInLastTrendReversal) / closeInLastTrendReversal * 100.00
+            minorPercentInTrend := (minorCloseInTrend - closeInLastTrendReversal) / closeInLastTrendReversal * 100.00
+            break   
 
     if(minorPercentInTrend < takeProfit)
         targetHit := targetHit + 1
 
-    upTrendOccurrences := upTrendOccurrences + 1
+    downTrendOcurrences := downTrendOcurrences + 1
 
     totalMajorPercent := nz(totalMajorPercent + majorPercentInTrend)
     totalMinorPercent := nz(totalMinorPercent + minorPercentInTrend)
 
     majorCloseInTrendText = '\nMAJOR_%: ' + tostring(majorPercentInTrend)
     minorCloseInTrendText =  '\nMINOR_%: ' + tostring(minorPercentInTrend)
-    avgMajorPercentInTrendText = '\n\nAVG MAJOR_%: ' + tostring(totalMajorPercent/upTrendOccurrences)
-    avgMinorPercentInTrendText = '\nAVG MINOR_%: ' + tostring(totalMinorPercent/upTrendOccurrences)
-    upTrendOccurrencesText = '\n\nUPTRENDS: ' + tostring(upTrendOccurrences)
+    avgMajorPercentInTrendText = '\n\nAVG MAJOR_%: ' + tostring(totalMajorPercent/downTrendOcurrences)
+    avgMinorPercentInTrendText = '\nAVG MINOR_%: ' + tostring(totalMinorPercent/downTrendOcurrences)
+    downTrendOccurrencesText = '\n\nDOWNTRENDS: ' + tostring(downTrendOcurrences)
     targetHitText = '\nHIT ' + tostring(takeProfit) + '%: ' + tostring(targetHit)
-    targetHitPercentText = '\nHIT_%: ' + tostring((targetHit/upTrendOccurrences) * 100) 
+    targetHitPercentText = '\nHIT_%: ' + tostring((targetHit/downTrendOcurrences) * 100) 
 
-    infoText = 'ANALYTICS\n'  + majorCloseInTrendText + minorCloseInTrendText + avgMajorPercentInTrendText + avgMinorPercentInTrendText + upTrendOccurrencesText + targetHitText + targetHitPercentText
+    infoText = 'ANALYTICS\n'  + majorCloseInTrendText + minorCloseInTrendText + avgMajorPercentInTrendText + avgMinorPercentInTrendText + downTrendOccurrencesText + targetHitText + targetHitPercentText
     label.new(bar_index, high + high*0.015 , infoText, color=color.blue, textcolor=color.white, style=label.style_labeldown, size=size.normal, yloc=yloc.price)
-
-
-majorCloseInTrend := 0.0
-minorCloseInTrend := 30000.0
 
 alertcondition(upTrendConditional, title="Open Position", message="Open Position")
 alertcondition(downTrendConditional, title="Close Position", message="Close Position")
