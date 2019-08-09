@@ -134,6 +134,7 @@ var upTrendOccurrences = 0
 var downTrendOcurrences = 0
 var totalMajorPercent = 0.0
 var totalMinorPercent = 0.0
+var totalBar = 0.0
 var targetHit = 0
 
 upTrendConditional = direction == 1 and direction[1] == -1
@@ -148,7 +149,7 @@ if isLong() and downTrendConditional
     minorCloseInTrend = low
     
     for i = 0 to 300
-        
+        totalBar := totalBar + 1.0
         if direction[i] == 1 and direction[i+1] == 1
             majorCloseInTrend := max(high[i], majorCloseInTrend)
             minorCloseInTrend := min(low[i], minorCloseInTrend)
@@ -174,11 +175,12 @@ if isLong() and downTrendConditional
     
     avgMajorPercentInTrendText = '\n\nAVG MAJOR_%: ' + tostring(totalMajorPercent/upTrendOccurrences)
     avgMinorPercentInTrendText = '\nAVG MINOR_%: ' + tostring(totalMinorPercent/upTrendOccurrences)
+    avgBars =                    '\nAVG BARS: ' + tostring(totalBar/upTrendOccurrences)
     
     targetHitText =              '\n\nHIT ' + tostring(takeProfit) + '%: ' + tostring(targetHit)
     targetHitPercentText =       '\nHIT_%: ' + tostring((targetHit/upTrendOccurrences) * 100) 
 
-    infoText = 'ANALYTICS'  + upTrendOccurrencesText + majorCloseInTrendText + minorCloseInTrendText + avgMajorPercentInTrendText + avgMinorPercentInTrendText + targetHitText + targetHitPercentText
+    infoText = 'ANALYTICS'  + upTrendOccurrencesText + majorCloseInTrendText + minorCloseInTrendText + avgMajorPercentInTrendText + avgMinorPercentInTrendText + avgBars + targetHitText + targetHitPercentText
     label.new(bar_index, high + high*-0.015 , infoText, color=color.blue, textcolor=color.white, style=label.style_labelup, size=size.normal, yloc=yloc.price)
 
 if isShort() and upTrendConditional
@@ -190,7 +192,7 @@ if isShort() and upTrendConditional
     minorCloseInTrend = low
 
     for i = 1 to 300
-
+        totalBar := totalBar + 1.0
         if direction[i] == -1 and direction[i+1] == -1
             majorCloseInTrend := max(high[i], majorCloseInTrend)
             minorCloseInTrend := min(low[i], minorCloseInTrend)
@@ -209,19 +211,23 @@ if isShort() and upTrendConditional
     totalMajorPercent := nz(totalMajorPercent + majorPercentInTrend)
     totalMinorPercent := nz(totalMinorPercent + minorPercentInTrend)
 
-    majorCloseInTrendText = '\nMAJOR_%: ' + tostring(majorPercentInTrend)
-    minorCloseInTrendText =  '\nMINOR_%: ' + tostring(minorPercentInTrend)
+    downTrendOccurrencesText =   '\nDOWNTRENDS: ' + tostring(downTrendOcurrences)
+
+    majorCloseInTrendText =      '\n\nMAJOR_%: ' + tostring(majorPercentInTrend)
+    minorCloseInTrendText =      '\nMINOR_%: ' + tostring(minorPercentInTrend)
+    
     avgMajorPercentInTrendText = '\n\nAVG MAJOR_%: ' + tostring(totalMajorPercent/downTrendOcurrences)
     avgMinorPercentInTrendText = '\nAVG MINOR_%: ' + tostring(totalMinorPercent/downTrendOcurrences)
-    downTrendOccurrencesText = '\n\nDOWNTRENDS: ' + tostring(downTrendOcurrences)
-    targetHitText = '\nHIT ' + tostring(takeProfit) + '%: ' + tostring(targetHit)
-    targetHitPercentText = '\nHIT_%: ' + tostring((targetHit/downTrendOcurrences) * 100) 
+    avgBars =                    '\nAVG BARS: ' + tostring(totalBar/downTrendOcurrences)
+    
+    targetHitText =              '\n\nHIT ' + tostring(takeProfit) + '%: ' + tostring(targetHit)
+    targetHitPercentText =       '\nHIT_%: ' + tostring((targetHit/downTrendOcurrences) * 100) 
+    
+    analyticsDownTrendText = 'ANALYTICS' + downTrendOccurrencesText + majorCloseInTrendText + minorCloseInTrendText + avgMajorPercentInTrendText + avgMinorPercentInTrendText + avgBars + targetHitText + targetHitPercentText
+    label.new(bar_index, high + high*0.015 , analyticsDownTrendText, color=color.blue, textcolor=color.white, style=label.style_labeldown, size=size.normal, yloc=yloc.price)
 
-    infoText = 'ANALYTICS\n'  + majorCloseInTrendText + minorCloseInTrendText + avgMajorPercentInTrendText + avgMinorPercentInTrendText + downTrendOccurrencesText + targetHitText + targetHitPercentText
-    label.new(bar_index, high + high*0.015 , infoText, color=color.blue, textcolor=color.white, style=label.style_labeldown, size=size.normal, yloc=yloc.price)
-
-alertcondition(upTrendConditional, title="Open Position", message="Open Position")
-alertcondition(downTrendConditional, title="Close Position", message="Close Position")
+alertcondition(upTrendConditional, title="UPTREND", message="Buy")
+alertcondition(downTrendConditional, title="DOWNTREND", message="Sell")
 //lapos_x = timenow + round(change(time)*30)
 //lapos_y = highest(20)
 //avgText = tostring(totalMajorPercent/upTrendOccurrences)  + '\n' + tostring(totalMinorPercent/upTrendOccurrences) + '\n' + tostring(targetHit) +'\n' + tostring(upTrendOccurrences)
