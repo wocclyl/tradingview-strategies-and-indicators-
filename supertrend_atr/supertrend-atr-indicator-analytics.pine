@@ -183,14 +183,14 @@ if isLong() and downTrendConditional
     infoText = 'ANALYTICS'
     infoText := appendText(infoText, '\nUPTRENDS: ' + tostring(upTrendOccurrences))
 
-    infoText := appendText(infoText, '\n\nMAJOR_%: ' + tostring(majorPercentInTrend))
-    infoText := appendText(infoText, '\nMINOR_%: ' + tostring(minorPercentInTrend))
+    infoText := appendText(infoText, '\n\nTREND MAJOR_%: ' + tostring(majorPercentInTrend))
+    infoText := appendText(infoText, '\nTREND MINOR_%: ' + tostring(minorPercentInTrend))
 
     infoText := appendText(infoText, '\n\nAVG MAJOR_%: ' + tostring(totalMajorPercent/upTrendOccurrences))
     infoText := appendText(infoText, '\nAVG MINOR_%: ' + tostring(totalMinorPercent/upTrendOccurrences))
 
     infoText := appendText(infoText, '\n\nMAJOR T_BARS: ' + tostring(majorTotalBars))
-    infoText := appendText(infoText, '\nAVG BARS: ' + tostring(totalBar/upTrendOccurrences))
+    infoText := appendText(infoText, '\nAVG T_BARS: ' + tostring(totalBar/upTrendOccurrences))
 
     infoText := appendText(infoText, '\n\nHIT ' + tostring(takeProfit) + '%: ' + tostring(targetHit))
     infoText := appendText(infoText, '\nHIT_%: ' + tostring((targetHit/upTrendOccurrences) * 100) )
@@ -204,11 +204,12 @@ if isShort() and upTrendConditional
     minorPercentInTrend = 0.0
     majorCloseInTrend = high
     minorCloseInTrend = low
-    totalBar = 0.0
+    localTotalBars = 0.0
 
     for i = 1 to 300
-        totalBar := totalBar + 1.0
+
         if direction[i] == -1 and direction[i+1] == -1
+            localTotalBars := localTotalBars + 1.0
             majorCloseInTrend := max(high[i], majorCloseInTrend)
             minorCloseInTrend := min(low[i], minorCloseInTrend)
             
@@ -226,20 +227,25 @@ if isShort() and upTrendConditional
     totalMajorPercent := nz(totalMajorPercent + majorPercentInTrend)
     totalMinorPercent := nz(totalMinorPercent + minorPercentInTrend)
 
-    downTrendOccurrencesText =   '\nDOWNTRENDS: ' + tostring(downTrendOcurrences)
+    totalBar := localTotalBars + totalBar
+    majorTotalBars := max(majorTotalBars, localTotalBars)
+    
+    infoText = 'ANALYTICS'
+    infoText := appendText(infoText, '\nDOWNTRENDS: ' + tostring(downTrendOcurrences))
 
-    majorCloseInTrendText =      '\n\nMAJOR_%: ' + tostring(majorPercentInTrend)
-    minorCloseInTrendText =      '\nMINOR_%: ' + tostring(minorPercentInTrend)
-    
-    avgMajorPercentInTrendText = '\n\nAVG MAJOR_%: ' + tostring(totalMajorPercent/downTrendOcurrences)
-    avgMinorPercentInTrendText = '\nAVG MINOR_%: ' + tostring(totalMinorPercent/downTrendOcurrences)
-    avgBars =                    '\nAVG BARS: ' + tostring(totalBar/downTrendOcurrences)
-    
-    targetHitText =              '\n\nHIT ' + tostring(takeProfit) + '%: ' + tostring(targetHit)
-    targetHitPercentText =       '\nHIT_%: ' + tostring((targetHit/downTrendOcurrences) * 100) 
-    
-    analyticsDownTrendText = 'ANALYTICS' + downTrendOccurrencesText + majorCloseInTrendText + minorCloseInTrendText + avgMajorPercentInTrendText + avgMinorPercentInTrendText + avgBars + targetHitText + targetHitPercentText
-    label.new(bar_index, high + high*0.015 , analyticsDownTrendText, color=color.blue, textcolor=color.white, style=label.style_labeldown, size=size.normal, yloc=yloc.price)
+    infoText := appendText(infoText, '\n\nTREND MAJOR_%: ' + tostring(majorPercentInTrend))
+    infoText := appendText(infoText, '\nTREND MINOR_%: ' + tostring(minorPercentInTrend))
+
+    infoText := appendText(infoText, '\n\nAVG MAJOR_%: ' + tostring(totalMajorPercent/downTrendOcurrences))
+    infoText := appendText(infoText, '\nAVG MINOR_%: ' + tostring(totalMinorPercent/downTrendOcurrences))
+
+    infoText := appendText(infoText, '\n\nMAJOR T_BARS: ' + tostring(majorTotalBars))
+    infoText := appendText(infoText, '\nAVG T_BARS: ' + tostring(totalBar/downTrendOcurrences))
+
+    infoText := appendText(infoText, '\n\nHIT ' + tostring(takeProfit) + '%: ' + tostring(targetHit))
+    infoText := appendText(infoText, '\nHIT_%: ' + tostring((targetHit/downTrendOcurrences) * 100) )
+
+    label.new(bar_index, high + high*0.015 , infoText, color=color.blue, textcolor=color.white, style=label.style_labeldown, size=size.normal, yloc=yloc.price)
 
 alertcondition(upTrendConditional, title="UPTREND", message="Buy")
 alertcondition(downTrendConditional, title="DOWNTREND", message="Sell")
