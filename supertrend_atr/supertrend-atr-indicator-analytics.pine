@@ -180,32 +180,20 @@ if isLong() and downTrendConditional
     totalBar := localTotalBars + totalBar
     majorTotalBars := max(majorTotalBars, localTotalBars)
 
-    upTrendOccurrencesText =     '\nUPTRENDS: ' + tostring(upTrendOccurrences)
-
-    majorCloseInTrendText =      '\n\nMAJOR_%: ' + tostring(majorPercentInTrend)
-    minorCloseInTrendText =      '\nMINOR_%: ' + tostring(minorPercentInTrend)
-    
-    avgMajorPercentInTrendText = '\n\nAVG MAJOR_%: ' + tostring(totalMajorPercent/upTrendOccurrences)
-    avgMinorPercentInTrendText = '\nAVG MINOR_%: ' + tostring(totalMinorPercent/upTrendOccurrences)
-
-    majorTotalbarsText =         '\n\nMAJOR T_BARS: ' + tostring(majorTotalBars)
-    avgBars =                    '\nAVG BARS: ' + tostring(totalBar/upTrendOccurrences)
-    
-    targetHitText =              '\n\nHIT ' + tostring(takeProfit) + '%: ' + tostring(targetHit)
-    targetHitPercentText =       '\nHIT_%: ' + tostring((targetHit/upTrendOccurrences) * 100) 
-
-    
-
     infoText = 'ANALYTICS'
-    infoText := appendText(infoText, upTrendOccurrencesText)
-    infoText := appendText(infoText, majorCloseInTrendText)
-    infoText := appendText(infoText, minorCloseInTrendText)
-    infoText := appendText(infoText, avgMajorPercentInTrendText)
-    infoText := appendText(infoText, avgMinorPercentInTrendText)
-    infoText := appendText(infoText, majorTotalbarsText)
-    infoText := appendText(infoText, avgBars)
-    infoText := appendText(infoText, targetHitText)
-    infoText := appendText(infoText, targetHitPercentText)
+    infoText := appendText(infoText, '\nUPTRENDS: ' + tostring(upTrendOccurrences))
+
+    infoText := appendText(infoText, '\n\nMAJOR_%: ' + tostring(majorPercentInTrend))
+    infoText := appendText(infoText, '\nMINOR_%: ' + tostring(minorPercentInTrend))
+
+    infoText := appendText(infoText, '\n\nAVG MAJOR_%: ' + tostring(totalMajorPercent/upTrendOccurrences))
+    infoText := appendText(infoText, '\nAVG MINOR_%: ' + tostring(totalMinorPercent/upTrendOccurrences))
+
+    infoText := appendText(infoText, '\n\nMAJOR T_BARS: ' + tostring(majorTotalBars))
+    infoText := appendText(infoText, '\nAVG BARS: ' + tostring(totalBar/upTrendOccurrences))
+
+    infoText := appendText(infoText, '\n\nHIT ' + tostring(takeProfit) + '%: ' + tostring(targetHit))
+    infoText := appendText(infoText, '\nHIT_%: ' + tostring((targetHit/upTrendOccurrences) * 100) )
     
     label.new(bar_index, high + high*-0.015 , infoText, color=color.blue, textcolor=color.white, style=label.style_labelup, size=size.normal, yloc=yloc.price)
 
