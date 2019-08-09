@@ -139,6 +139,7 @@ var upTrendOccurrences = 0
 var downTrendOcurrences = 0
 var totalMajorPercent = 0.0
 var totalMinorPercent = 0.0
+var trendPercentCloseSuccess = 0.0
 
 var targetHit = 0
 var majorTotalBars = 0.0
@@ -174,6 +175,9 @@ if isLong() and downTrendConditional
     if(majorPercentInTrend > takeProfit)
         targetHit := targetHit + 1
 
+    if(trendPercentClose > 0)
+        trendPercentCloseSuccess := trendPercentCloseSuccess + 1    
+
     upTrendOccurrences := upTrendOccurrences + 1
 
     totalMajorPercent := nz(totalMajorPercent + majorPercentInTrend)
@@ -188,6 +192,7 @@ if isLong() and downTrendConditional
     infoText := appendText(infoText, '\n\nTREND MAJOR_%: ' + tostring(majorPercentInTrend))
     infoText := appendText(infoText, '\nTREND MINOR_%: ' + tostring(minorPercentInTrend))
     infoText := appendText(infoText, '\nTREND % CLOSE: ' + tostring(trendPercentClose))
+    infoText := appendText(infoText, '\nTREND SUCCESS: ' + tostring(trendPercentCloseSuccess))
  
     infoText := appendText(infoText, '\n\nAVG MAJOR_%: ' + tostring(totalMajorPercent/upTrendOccurrences))
     infoText := appendText(infoText, '\nAVG MINOR_%: ' + tostring(totalMinorPercent/upTrendOccurrences))
