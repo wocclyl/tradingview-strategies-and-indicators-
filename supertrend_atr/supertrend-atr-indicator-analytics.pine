@@ -143,15 +143,17 @@ upTrendConditional = direction == 1 and direction[1] == -1
 downTrendConditional = direction == -1 and direction[1] == 1
 
 if isLong() and downTrendConditional
-    for i = 1 to 300
-        majorCloseInTrend := max(high[i], majorCloseInTrend)
-        minorCloseInTrend := min(minorCloseInTrend, low[i])
+    for i = 0 to 300
+        
+        if direction[i] == 1 and direction[i+1] == 1
+            majorCloseInTrend := max(high[i], majorCloseInTrend)
+            minorCloseInTrend := min(low[i], minorCloseInTrend)
+            
         if direction[i] == 1 and direction[i+1] == -1
             closeInLastTrendReversal := close[i]
-            break
-    
-    majorPercentInTrend := (majorCloseInTrend - closeInLastTrendReversal) / closeInLastTrendReversal * 100.00
-    minorPercentInTrend := (minorCloseInTrend - closeInLastTrendReversal) / closeInLastTrendReversal * 100.00
+            majorPercentInTrend := (majorCloseInTrend - closeInLastTrendReversal) / closeInLastTrendReversal * 100.00
+            minorPercentInTrend := (minorCloseInTrend - closeInLastTrendReversal) / closeInLastTrendReversal * 100.00
+            break   
 
     if(majorPercentInTrend > takeProfit)
         targetHit := targetHit + 1
@@ -163,13 +165,14 @@ if isLong() and downTrendConditional
 
     majorCloseInTrendText = '\nMAJOR_%: ' + tostring(majorPercentInTrend)
     minorCloseInTrendText =  '\nMINOR_%: ' + tostring(minorPercentInTrend)
+    minor = '\nMINOR: ' + tostring(minorCloseInTrend)
     avgMajorPercentInTrendText = '\n\nAVG MAJOR_%: ' + tostring(totalMajorPercent/upTrendOccurrences)
     avgMinorPercentInTrendText = '\nAVG MINOR_%: ' + tostring(totalMinorPercent/upTrendOccurrences)
     upTrendOccurrencesText = '\n\nUPTRENDS: ' + tostring(upTrendOccurrences)
     targetHitText = '\nHIT ' + tostring(takeProfit) + '%: ' + tostring(targetHit)
     targetHitPercentText = '\nHIT_%: ' + tostring((targetHit/upTrendOccurrences) * 100) 
 
-    infoText = 'ANALYTICS\n'  + majorCloseInTrendText + minorCloseInTrendText + avgMajorPercentInTrendText + avgMinorPercentInTrendText + upTrendOccurrencesText + targetHitText + targetHitPercentText
+    infoText = 'ANALYTICS\n'  + majorCloseInTrendText + minorCloseInTrendText + avgMajorPercentInTrendText + avgMinorPercentInTrendText + upTrendOccurrencesText + targetHitText + targetHitPercentText + minor
     label.new(bar_index, high + high*-0.015 , infoText, color=color.blue, textcolor=color.white, style=label.style_labelup, size=size.normal, yloc=yloc.price)
 
 if isShort() and upTrendConditional
