@@ -3,7 +3,16 @@
 //strategy(title = "RePaNoCHa V4 [Backtest]", overlay = true, initial_capital = 1000, pyramiding = 100,
 //   calc_on_order_fills = false, calc_on_every_tick = false, default_qty_type = strategy.percent_of_equity, default_qty_value = 100, commission_value = 0.075)
 
-study(title="RePaNoCHa V4 [Alerts]", overlay=true)
+strategy(title="RePaNoCHa V4 [Alerts]", 
+         overlay=true,
+         precision = 8,
+         calc_on_order_fills = true,
+         calc_on_every_tick = true,
+         default_qty_type = strategy.cash,
+         default_qty_value = 1000,
+         initial_capital = 1000,
+         currency = currency.USD,
+         linktoseries = true)
 
 // 
 // Copyright by XaviZ v1.0 26/07/2019 
@@ -551,25 +560,32 @@ alertcondition(
 
 // BACKTESTING
 // ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+notHasOpenPosition = strategy.opentrades == 0
 
-//BT_Final_longCondition = Position == "SHORT" ? na : longCondition
-//BT_Final_shortCondition = Position == "LONG" ? na : shortCondition
+BT_Final_longCondition = Position == "SHORT" ? na : longCondition
+BT_Final_shortCondition = Position == "LONG" ? na : shortCondition
 
-//testStartYear = input(2019, "BACKTEST START YEAR", minval = 1, maxval = 2222) 
-//testStartMonth = input(01, "BACKTEST START MONTH", minval = 1, maxval = 12)
-//testStartDay = input(01, "BACKTEST START DAY", minval = 1, maxval = 31)
-//testPeriodStart = timestamp(testStartYear,testStartMonth,testStartDay,0,0)
+testStartYear = input(2019, "BACKTEST START YEAR", minval = 1, maxval = 2222) 
+testStartMonth = input(01, "BACKTEST START MONTH", minval = 1, maxval = 12)
+testStartDay = input(01, "BACKTEST START DAY", minval = 1, maxval = 31)
+testPeriodStart = timestamp(testStartYear,testStartMonth,testStartDay,0,0)
 
-//if (BT_Final_longCondition)
-//    strategy.entry("long", strategy.long, when = time >= testPeriodStart)
-//if (BT_Final_shortCondition) 
-//    strategy.entry("short", strategy.short, when = time >= testPeriodStart)
+profit = input(0.1, "PROFIT")
+var priceClose = 999999.9
+
+if (BT_Final_longCondition and notHasOpenPosition)
+    priceClose := close + close*profit/100
+    strategy.entry("long", strategy.long, when = time >= testPeriodStart)
+if (BT_Final_shortCondition and notHasOpenPosition) 
+    strategy.entry("short", strategy.short, when = time >= testPeriodStart)
     
-//pips_corection = input(2, "(TICKS/PIPS CORRECTION)")
 
 //strategy.exit("Tsl", "long", trail_points = (abs((last_open_longCondition*(1+(tsi/100)))-last_open_longCondition)*pips_corection),
-//   trail_offset = (high*(ts/100))*pips_corection, loss = Act_sl ? (abs((last_open_longCondition*(1-(sl/100)))-last_open_longCondition)*pips_corection) : na) 
+   //trail_offset = (high*(ts/100))*pips_corection, loss = Act_sl ? (abs((last_open_longCondition*(1-(sl/100)))-last_open_longCondition)*pips_corection) : na) 
 //strategy.exit("Tss", "short", trail_points = (abs((last_open_shortCondition*(1-(tsi/100)))-last_open_shortCondition)*pips_corection),
-//   trail_offset = (low*(ts/100))*pips_corection, loss = Act_sl ? (abs((last_open_shortCondition*(1+(sl/100)))-last_open_shortCondition)*pips_corection) : na) 
+   //trail_offset = (low*(ts/100))*pips_corection, loss = Act_sl ? (abs((last_open_shortCondition*(1+(sl/100)))-last_open_shortCondition)*pips_corection) : na) 
 
+strategy.exit('exit', 'long', limit=priceClose)
+strategy.close('long', when=Final_XlongCondition)
+//strategy.exit('exit', 'long', when=(Final_Long_ts or Final_XlongCondition), limit=close)
 //strategy.close_all(when = Final_XlongCondition or Final_XshortCondition or Final_Long_sl or Final_Short_sl)
