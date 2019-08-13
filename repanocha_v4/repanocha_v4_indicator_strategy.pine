@@ -591,8 +591,15 @@ var priceClose = 999999.9
 if (BT_Final_longCondition and notHasOpenPosition)
     priceClose := close + close * profit/100
     strategy.entry("long", strategy.long, when = backTestPeriod())
-//if (BT_Final_shortCondition and notHasOpenPosition) 
-//    strategy.entry("short", strategy.short, when = time >= testPeriodStart)
+if (BT_Final_shortCondition and notHasOpenPosition)
+    negativeProfit = profit * -1
+    priceClose := close + close * negativeProfit/100
+    strategy.entry("short", strategy.short, when = backTestPeriod())
 
-strategy.exit('exit', 'long', limit=priceClose)
-strategy.close('long', when=Final_XlongCondition)
+if( Position == 'LONG')
+    strategy.exit('exit', 'long', limit=priceClose)
+    strategy.close('long', when=Final_XlongCondition)
+
+if( Position == 'SHORT')
+    strategy.exit('exit', 'short', limit=priceClose)
+    strategy.close('short', when=Final_XshortCondition)
