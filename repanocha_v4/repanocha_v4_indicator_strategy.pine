@@ -40,7 +40,7 @@ strategy(title="RePaNoCHa V4 [Alerts]",
 // INITIAL SETTINGS
 // ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
 
-Position = input("BOTH", "POSITIONS", options = ["BOTH","LONG","SHORT"])
+Position = input("LONG", "POSITIONS", options = ["BOTH","LONG","SHORT"])
 src = input(hlc3, "SOURCE", type = input.source)
 
 // T3
@@ -559,33 +559,40 @@ alertcondition(
 // Using t=limit on entries --> comission_value = 0.025
 
 // BACKTESTING
+//
 // ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
-notHasOpenPosition = strategy.opentrades == 0
+
+
+// === BACKTEST RANGE ===
+backTestSectionFrom = input(title = "═══════════════ FROM ═══════════════", defval = true, type = input.bool)
+
+FromMonth       = input(defval = 1, title = "Month", minval = 1)
+FromDay         = input(defval = 1, title = "Day", minval = 1)
+FromYear        = input(defval = 2019, title = "Year", minval = 2014)
+
+backTestSectionTo = input(title = "════════════════ TO ════════════════", defval = true, type = input.bool)
+ToMonth         = input(defval = 31, title = "Month", minval = 1)
+ToDay           = input(defval = 12, title = "Day", minval = 1)
+ToYear          = input(defval = 9999, title = "Year", minval = 2014)
+
+backTestPeriod() => (time > timestamp(FromYear, FromMonth, FromDay, 00, 00)) and (time < timestamp(ToYear, ToMonth, ToDay, 23, 59))
+
+//
+// ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒ //
 
 BT_Final_longCondition = Position == "SHORT" ? na : longCondition
 BT_Final_shortCondition = Position == "LONG" ? na : shortCondition
 
-testStartYear = input(2019, "BACKTEST START YEAR", minval = 1, maxval = 2222) 
-testStartMonth = input(01, "BACKTEST START MONTH", minval = 1, maxval = 12)
-testStartDay = input(01, "BACKTEST START DAY", minval = 1, maxval = 31)
-testPeriodStart = timestamp(testStartYear,testStartMonth,testStartDay,0,0)
+notHasOpenPosition = strategy.opentrades == 0
 
 profit = input(0.1, "PROFIT")
 var priceClose = 999999.9
 
 if (BT_Final_longCondition and notHasOpenPosition)
-    priceClose := close + close*profit/100
-    strategy.entry("long", strategy.long, when = time >= testPeriodStart)
-if (BT_Final_shortCondition and notHasOpenPosition) 
-    strategy.entry("short", strategy.short, when = time >= testPeriodStart)
-    
-
-//strategy.exit("Tsl", "long", trail_points = (abs((last_open_longCondition*(1+(tsi/100)))-last_open_longCondition)*pips_corection),
-   //trail_offset = (high*(ts/100))*pips_corection, loss = Act_sl ? (abs((last_open_longCondition*(1-(sl/100)))-last_open_longCondition)*pips_corection) : na) 
-//strategy.exit("Tss", "short", trail_points = (abs((last_open_shortCondition*(1-(tsi/100)))-last_open_shortCondition)*pips_corection),
-   //trail_offset = (low*(ts/100))*pips_corection, loss = Act_sl ? (abs((last_open_shortCondition*(1+(sl/100)))-last_open_shortCondition)*pips_corection) : na) 
+    priceClose := close + close * profit/100
+    strategy.entry("long", strategy.long, when = backTestPeriod())
+//if (BT_Final_shortCondition and notHasOpenPosition) 
+//    strategy.entry("short", strategy.short, when = time >= testPeriodStart)
 
 strategy.exit('exit', 'long', limit=priceClose)
 strategy.close('long', when=Final_XlongCondition)
-//strategy.exit('exit', 'long', when=(Final_Long_ts or Final_XlongCondition), limit=close)
-//strategy.close_all(when = Final_XlongCondition or Final_XshortCondition or Final_Long_sl or Final_Short_sl)
