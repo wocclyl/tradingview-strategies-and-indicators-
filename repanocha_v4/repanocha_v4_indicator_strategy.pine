@@ -3,7 +3,7 @@
 //strategy(title = "RePaNoCHa V4 [Backtest]", overlay = true, initial_capital = 1000, pyramiding = 100,
 //   calc_on_order_fills = false, calc_on_every_tick = false, default_qty_type = strategy.percent_of_equity, default_qty_value = 100, commission_value = 0.075)
 
-strategy(title="RePaNoCHa V4 [Alerts]", 
+strategy(title="REPANOCHA V4 EDITED", 
          overlay=true,
          precision = 8,
          calc_on_order_fills = true,
@@ -585,15 +585,14 @@ BT_Final_shortCondition = Position == "LONG" ? na : shortCondition
 
 notHasOpenPosition = strategy.opentrades == 0
 
-profit = input(0.1, "PROFIT")
 var priceClose = 999999.9
 
 if (BT_Final_longCondition and notHasOpenPosition)
-    priceClose := close + close * profit/100
+    priceClose := close + close * tsi/100
     strategy.entry("long", strategy.long, when = backTestPeriod())
+
 if (BT_Final_shortCondition and notHasOpenPosition)
-    negativeProfit = profit * -1
-    priceClose := close + close * negativeProfit/100
+    priceClose := close - close * tsi/100
     strategy.entry("short", strategy.short, when = backTestPeriod())
 
 if( Position == 'LONG')
