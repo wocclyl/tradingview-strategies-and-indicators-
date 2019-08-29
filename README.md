@@ -7,7 +7,6 @@ This repository contains strategies and indicators made with [pinescript](https:
 + [TRAILING STOP LOSS TO SHORT AND LONG](https://www.tradingview.com/script/0KrB3hnV-TRAILING-STOP-LOSS-TO-LONG-AND-SHORT/)
 + [SUPERTREND ATR WITH TRAILING STOP LOSS](https://www.tradingview.com/script/L9GkARD2-SUPERTREND-ATR-WITH-TRAILING-STOP-LOSS/)
 
-SUPERTREND ATR WITH TRAILING STOP LOSS
 
 ## LICENSE
 
